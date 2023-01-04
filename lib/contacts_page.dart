@@ -1,11 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:rxdart_practice/widgets/contact_list_tile.dart';
-import 'package:rxdart_practice/widgets/gradient_fab.dart';
 import 'package:rxdart_practice/widgets/quick_scrollable_bar.dart';
 
-List nameList = [
+const List<String> nameList = [
   'Anya Ostrem',
   'Burt Hutchison',
   'Chana Sobolik',
@@ -65,35 +62,18 @@ class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key});
 }
 
-class _ContactsPageState extends State<ContactsPage>
-    with TickerProviderStateMixin {
-  late ScrollController scrollController;
-  late AnimationController animationController;
-  late Animation<double> animation;
-
-  @override
-  void initState() {
-    scrollController = ScrollController();
-    scrollController.addListener(scrollListener);
-    animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    animation = CurvedAnimation(
-      parent: animationController,
-      curve: Curves.linear,
-    );
-    animationController.forward();
-    super.initState();
-  }
+class _ContactsPageState extends State<ContactsPage> {
+  final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: <Widget>[
-            CustomScrollView(controller: scrollController, slivers: <Widget>[
+    return Scaffold(
+      body: Stack(
+        children: [
+          CustomScrollView(
+            physics: const ClampingScrollPhysics(),
+            controller: scrollController,
+            slivers: [
               const SliverAppBar(
                 backgroundColor: Colors.white,
                 expandedHeight: 180.0,
@@ -106,38 +86,24 @@ class _ContactsPageState extends State<ContactsPage>
                 ),
               ),
               SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  return ContactRowWidget(name: nameList[index]);
-                }, childCount: nameList.length),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return ContactListTile(name: nameList[index]);
+                  },
+                  childCount: nameList.length,
+                ),
               )
-            ]),
-            Container(
-              margin: const EdgeInsets.only(top: 190),
-              child: QuickScrollableBar(
-                nameList: nameList,
-                scrollController: scrollController,
-              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 0),
+            child: QuickScrollableBar(
+              nameList: nameList,
+              scrollController: scrollController,
             ),
-          ],
-        ),
-        floatingActionButton: GradientFab(animation: animation),
+          ),
+        ],
       ),
     );
-  }
-
-  //scroll listener for checking scroll direction and hide/show fab
-  scrollListener() {
-    if (scrollController.position.userScrollDirection ==
-        ScrollDirection.forward) {
-      animationController.forward();
-    } else {
-      animationController.reverse();
-    }
-  }
-
-  @override
-  void dispose() {
-    animationController.dispose();
-    super.dispose();
   }
 }

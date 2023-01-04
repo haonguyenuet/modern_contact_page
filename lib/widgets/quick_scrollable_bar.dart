@@ -1,7 +1,36 @@
 import 'package:flutter/material.dart';
 
+const List alphabets = [
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z'
+];
+
 class QuickScrollableBar extends StatefulWidget {
-  final List nameList;
+  final List<String> nameList;
   final ScrollController scrollController;
 
   const QuickScrollableBar({
@@ -25,65 +54,32 @@ class _QuickScrollableBarState extends State<QuickScrollableBar> {
   double _scrollBarHeight = 0.0;
   double _scrollBarContainerHeight = 0.0;
   double _scrollBarHeightDiff = 0.0;
-  int _scrollBarPosSelected = 0;
+  int _scrollBarIndexSelected = 0;
   bool _scrollBarBubbleVisibility = false;
 
   ScrollController get scrollController => widget.scrollController;
-  List get nameList => widget.nameList;
-
-  List alphabetList = [
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-    'H',
-    'I',
-    'J',
-    'K',
-    'L',
-    'M',
-    'N',
-    'O',
-    'P',
-    'Q',
-    'R',
-    'S',
-    'T',
-    'U',
-    'V',
-    'W',
-    'X',
-    'Y',
-    'Z'
-  ];
+  List<String> get nameList => widget.nameList;
 
   void _onVerticalDragUpdate(DragUpdateDetails details) {
+    print("details.delta.dy ${details.delta.dy}");
     setState(() {
       _scrollBarBubbleVisibility = true;
-      print(_offsetContainer);
-      print(details);
       if ((_offsetContainer + details.delta.dy) >= 0 &&
           (_offsetContainer + details.delta.dy) <=
               (_scrollBarContainerHeight - _scrollBarHeight)) {
         _offsetContainer += details.delta.dy;
-        print(_offsetContainer);
-        _scrollBarPosSelected =
-            ((_offsetContainer / _scrollBarHeight) % alphabetList.length)
-                .round();
-        print(_scrollBarPosSelected);
-        _scrollBarText = alphabetList[_scrollBarPosSelected];
+        _scrollBarIndexSelected =
+            ((_offsetContainer / _scrollBarHeight) % alphabets.length).round();
+        _scrollBarText = alphabets[_scrollBarIndexSelected];
         if (_scrollBarText != _scrollBarTextPrev) {
           for (var i = 0; i < nameList.length; i++) {
             print(_scrollBarText.toString());
-            if (_scrollBarText
-                    .toString()
-                    .compareTo(nameList[i].toString().toUpperCase()[0]) ==
-                0) {
-              print(nameList[i]);
-              scrollController.jumpTo(i * _contactRowSize);
+            if (_scrollBarText == nameList[i].toUpperCase()[0]) {
+              scrollController.animateTo(
+                i * _contactRowSize,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.bounceIn,
+              );
               break;
             }
           }
@@ -94,46 +90,12 @@ class _QuickScrollableBarState extends State<QuickScrollableBar> {
   }
 
   void _onVerticalDragStart(DragStartDetails details) {
+    print("details.globalPosition.dy ${details.globalPosition.dy}");
+
     _offsetContainer = details.globalPosition.dy - _scrollBarHeightDiff;
     setState(() {
       _scrollBarBubbleVisibility = true;
     });
-  }
-
-  getBubble() {
-    if (!_scrollBarBubbleVisibility) {
-      return Container();
-    }
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(30.0)),
-      ),
-      width: 30,
-      height: 30,
-      child: Center(
-        child: Text(
-          _scrollBarText,
-          style: const TextStyle(color: Colors.white, fontSize: 14.0),
-        ),
-      ),
-    );
-  }
-
-  _getAlphabetItem(int index) {
-    return Expanded(
-      child: Container(
-        width: 40,
-        height: 20,
-        alignment: Alignment.center,
-        child: Text(
-          alphabetList[index],
-          style: (index == _scrollBarPosSelected)
-              ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)
-              : const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
-        ),
-      ),
-    );
   }
 
   void _onVerticalEnd(DragEndDetails details) {
@@ -145,40 +107,81 @@ class _QuickScrollableBarState extends State<QuickScrollableBar> {
   @override
   Widget build(BuildContext context) {
     _screenHeight = MediaQuery.of(context).size.height;
-    return LayoutBuilder(builder: (context, constraints) {
-      _scrollBarHeightDiff = _screenHeight - constraints.biggest.height;
-      _scrollBarHeight = (constraints.biggest.height) / alphabetList.length;
-      _scrollBarContainerHeight = (constraints.biggest.height); //NO
-      return Stack(
-        children: <Widget>[
-          Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onVerticalDragEnd: _onVerticalEnd,
-              onVerticalDragUpdate: _onVerticalDragUpdate,
-              onVerticalDragStart: _onVerticalDragStart,
-              child: Container(
-                //height: 20.0 * 26,
-                color: Colors.transparent,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ...List.generate(
-                      alphabetList.length,
-                      (index) => _getAlphabetItem(index),
-                    )
-                  ],
+    // print("_screenHeight $_screenHeight");
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _scrollBarContainerHeight = 20.0 * alphabets.length;
+        _scrollBarHeightDiff = _screenHeight - _scrollBarContainerHeight;
+        _scrollBarHeight = 20;
+
+        // _scrollBarHeightDiff = _screenHeight - constraints.biggest.height;
+        // _scrollBarHeight = (constraints.biggest.height) / alphabets.length;
+        // _scrollBarContainerHeight = (constraints.biggest.height); //NO
+        print("_scrollBarHeightDiff $_scrollBarHeightDiff");
+        print("_scrollBarHeight $_scrollBarHeight");
+        print("_scrollBarContainerHeight $_scrollBarContainerHeight");
+        return Container(
+          color: Colors.amber,
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: GestureDetector(
+                  onVerticalDragEnd: _onVerticalEnd,
+                  onVerticalDragUpdate: _onVerticalDragUpdate,
+                  onVerticalDragStart: _onVerticalDragStart,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ...List.generate(
+                        alphabets.length,
+                        (index) => _buildAlphabetItem(index),
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
+              Positioned(
+                right: _scrollBarMarginRight,
+                top: _offsetContainer,
+                child: _buildBubble(),
+              ),
+            ],
           ),
-          Positioned(
-            right: _scrollBarMarginRight,
-            top: _offsetContainer,
-            child: getBubble(),
-          ),
-        ],
-      );
-    });
+        );
+      },
+    );
+  }
+
+  Widget _buildAlphabetItem(int index) {
+    return Container(
+      width: 40,
+      height: 20,
+      color: Colors.blue,
+      alignment: Alignment.center,
+      child: Text(
+        alphabets[index],
+        style: (index == _scrollBarIndexSelected)
+            ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)
+            : const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+      ),
+    );
+  }
+
+  Widget _buildBubble() {
+    if (!_scrollBarBubbleVisibility) {
+      return const SizedBox();
+    }
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.all(Radius.circular(30.0)),
+      ),
+      width: 30,
+      height: 30,
+      child: Text(_scrollBarText),
+    );
   }
 }
