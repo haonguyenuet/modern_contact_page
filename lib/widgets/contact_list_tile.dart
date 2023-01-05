@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const contactListTileHeight = 45.0;
+
 class ContactListTile extends StatelessWidget {
   const ContactListTile({
     Key? key,
@@ -9,19 +11,24 @@ class ContactListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 30, top: 10, bottom: 10),
+    return Container(
+      height: contactListTileHeight,
+      padding: const EdgeInsets.only(left: 30),
+      color: Colors.black,
       child: RichText(
         text: TextSpan(
           style: const TextStyle(
             fontSize: 14.0,
-            color: Colors.black,
+            color: Colors.white,
           ),
-          children: <TextSpan>[
-            TextSpan(text: "${name.toString().split(' ')[0]} "),
+          children: [
             TextSpan(
-                text: name.toString().split(' ')[1],
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+              text: "${name.toString().split(' ')[0]} ",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextSpan(
+              text: name.toString().split(' ')[1],
+            ),
           ],
         ),
       ),

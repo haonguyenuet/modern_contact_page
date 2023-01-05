@@ -68,15 +68,16 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
           CustomScrollView(
-            physics: const ClampingScrollPhysics(),
             controller: scrollController,
+            physics: const ClampingScrollPhysics(),
             slivers: [
               const SliverAppBar(
-                backgroundColor: Colors.white,
-                expandedHeight: 180.0,
+                backgroundColor: Colors.black,
+                expandedHeight: 120.0,
                 pinned: true,
                 elevation: 0,
                 centerTitle: true,
@@ -98,7 +99,7 @@ class _ContactsPageState extends State<ContactsPage> {
           Padding(
             padding: const EdgeInsets.only(top: 0),
             child: QuickScrollableBar(
-              nameList: nameList,
+              names: nameList,
               scrollController: scrollController,
             ),
           ),
